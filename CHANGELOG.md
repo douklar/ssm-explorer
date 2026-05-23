@@ -2,6 +2,32 @@
 
 <!-- version list -->
 
+## v1.0.2 (2026-05-23)
+
+### Bug Fixes
+
+- Bypass mypy typer_rich_utils assignment check without comments via __dict__
+  ([`94efab3`](https://github.com/douklar/ssm-explorer/commit/94efab3b093b19a00851318e3b30777aca5b4bf0))
+
+### Chores
+
+- **ci**: Pin action versions by SHA, enable Node 24, and reconfigure dependabot settings
+  ([`d8b8ea1`](https://github.com/douklar/ssm-explorer/commit/d8b8ea134a736dd22de31d18b703143126d2e692))
+
+### Code Style
+
+- Apply ruff format to all source files
+  ([`7af5cdb`](https://github.com/douklar/ssm-explorer/commit/7af5cdbfaab456d17c2c555d15bc33b16bde2b16))
+
+- Apply ruff format; fix lockfile sync to push-only
+  ([`8b85534`](https://github.com/douklar/ssm-explorer/commit/8b85534432e4492f97a227bf0351ae254b5d08cd))
+
+### Refactoring
+
+- Add type annotations and use setattr for typer_rich_utils configuration updates
+  ([`ec22e63`](https://github.com/douklar/ssm-explorer/commit/ec22e63e09f55208691df2f8c87ece52d0fb10f8))
+
+
 ## v1.0.1 (2026-05-23)
 
 ### Bug Fixes
