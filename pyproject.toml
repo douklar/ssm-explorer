@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ssm-explorer"
-version = "1.0.0"
+version = "1.0.1"
 description = "A professional AWS SSM Parameter Store explorer and filter CLI tool"
 authors = ["Douklar DevOps Tools <github@hummatovic.com>"]
 readme = "README.md"
