@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,6 +30,18 @@ jobs:
 
       - name: Install Poetry
         run: pipx install poetry
+
+      - name: Sync Lockfile if Outdated
+        run: |
+          poetry lock --no-update
+          if [ -n "$(git status --porcelain poetry.lock)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add poetry.lock
+            git commit -m "chore: auto-sync poetry.lock [skip ci]"
+            git push
+            echo "Lockfile was out of sync. Successfully updated and pushed to repository."
+          fi
 
       - name: Cache Poetry cache
         uses: actions/cache@v4
