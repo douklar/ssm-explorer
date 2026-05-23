@@ -58,12 +58,15 @@ jobs:
           poetry install --no-interaction
 
       - name: Ruff lint
+        if: matrix.python-version == '3.12'
         run: poetry run ruff check src/
 
       - name: Ruff format check
+        if: matrix.python-version == '3.12'
         run: poetry run ruff format --check src/
 
       - name: Mypy type check
+        if: matrix.python-version == '3.12'
         run: poetry run mypy src/
 
       - name: Run tests
