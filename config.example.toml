@@ -1,0 +1,427 @@
+# =============================================================================
+#  SSM Explorer — Configuration Reference File
+#  config.example.toml
+# =============================================================================
+#
+#  This file documents EVERY available configuration option with:
+#    • What each setting does
+#    • Accepted values and their meaning
+#    • The built-in default (used when the key is absent from your config)
+#    • Real-world usage examples
+#
+#  HOW TO USE THIS FILE
+#  ────────────────────
+#  Option A — Let the tool create a ready-to-use config for you:
+#
+#      ssm-explorer config init
+#
+#  This writes the config to:  ~/.config/ssm-explorer/config.toml
+#  (XDG standard; you can change the location — see below)
+#
+#  Option B — Copy this file manually:
+#
+#      cp config.example.toml ~/.config/ssm-explorer/config.toml
+#
+#  Option C — Point to a custom path at runtime:
+#
+#      ssm-explorer list /my/path --config /path/to/my.toml
+#      SSM_EXPLORER_CONFIG=/path/to/my.toml ssm-explorer list /my/path
+#
+#  CONFIGURATION PRIORITY  (highest → lowest)
+#  ───────────────────────────────────────────
+#    1.  CLI flags passed at runtime          e.g. --profile prod --decrypt
+#    2.  This TOML config file
+#    3.  Environment variables                e.g. SSM_EXPLORER_SEARCH_DECRYPT=false
+#    4.  Built-in defaults (shown below)
+#
+#  READ-ONLY NOTICE
+#  ────────────────
+#  This tool ONLY reads from AWS SSM Parameter Store.
+#  AWS read APIs can include:
+#    • ssm:GetParameter
+#    • ssm:GetParameters
+#    • ssm:GetParametersByPath
+#    • ssm:DescribeParameters
+#  No write, put, delete or modify operations are issued to AWS — ever.
+#  The only local write permitted is saving output to a file (see [output]).
+#
+# =============================================================================
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  [aws]  —  AWS connection defaults
+# ─────────────────────────────────────────────────────────────────────────────
+[aws]
+
+# profile  (string)
+# ───────────────────────────────────────────────────────────────────────────
+# The AWS named profile to use for authentication.
+# Profiles are defined in ~/.aws/config or ~/.aws/credentials.
+#
+# Common values:
+#   "default"             → the [default] profile in ~/.aws
+#   "my_profile_aws"      → a named profile e.g. [profile my_profile_aws]
+#   "prod"                → a production profile
+#   "dev"                 → a development profile
+#
+# You can set per-run with:  --profile <name>
+#
+# Default: "" (no fallback; explicit profile required unless set here)
+profile = ""
+
+# region  (string)
+# ───────────────────────────────────────────────────────────────────────────
+# The AWS region where your SSM Parameter Store parameters live.
+#
+# Common values:
+#   "us-east-1"           → US East (N. Virginia)
+#   "eu-west-1"           → EU (Ireland)
+#   "eu-central-1"        → EU (Frankfurt)
+#   "ap-southeast-1"      → Asia Pacific (Singapore)
+#   "us-west-2"           → US West (Oregon)
+#
+# You can set per-run with:  --region <region>
+#
+# Default: "" (no fallback; explicit region or profile mapping required unless set here)
+region = ""
+
+# profile_from_env_tags  (array of strings)
+# ───────────────────────────────────────────────────────────────────────────
+# Optional profile fallback from process environment variables.
+# First key in this list with non-empty value wins.
+#
+# Example:
+#   Environment=myapp-prod
+#   profile_from_env_tags = ["Environment", "APP_ENV", "ENVIRONMENT"]
+#   → profile resolves to "myapp-prod" when --profile and aws.profile are empty.
+#
+# Default: ["Environment"]
+profile_from_env_tags = ["Environment"]
+
+# [aws.profile_from_env_value_map]  (table: env value -> profile)
+# ───────────────────────────────────────────────────────────────────────────
+# Optional remap when env value and AWS profile name differ.
+#
+# Example:
+#   Environment=myapp-prod
+#   [aws.profile_from_env_value_map]
+#   myapp-prod = "prod_account"
+#   myapp-staging = "stage_account"
+#
+# If a value is not mapped, raw value is used as profile.
+[aws.profile_from_env_value_map]
+# myapp-prod = "prod_account"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  [search]  —  Default search / fetch behaviour
+# ─────────────────────────────────────────────────────────────────────────────
+[search]
+
+# default_path  (string)
+# ───────────────────────────────────────────────────────────────────────────
+# When set, you can omit the PATH argument on every command.
+# The path MUST start with "/".
+#
+# Example paths:
+#   "/myapp/production"          → all production params for myapp
+#   "/platform/shared"           → shared platform parameters
+#   "/services/api/staging"      → staging params for the API service
+#   ""                           → (empty) PATH must be supplied each run
+#
+# Usage without this set:
+#   ssm-explorer list /myapp/production --profile my_profile_aws
+#
+# Usage WITH this set to "/myapp/production":
+#   ssm-explorer list --profile my_profile_aws          ← PATH is optional now
+#
+# You can still override per-run:
+#   ssm-explorer list /other/path --profile my_profile_aws
+#
+# Default: ""  (empty — PATH argument is required)
+default_path = "/myapp/production"
+
+# recursive  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# When true, the tool fetches parameters from all sub-paths under the given
+# prefix, not just the top level.
+#
+# Example — given path "/myapp":
+#   recursive = true  → returns /myapp/DB_HOST, /myapp/cache/REDIS_URL, etc.
+#   recursive = false → returns only /myapp/DB_HOST (top level only)
+#
+# Override per-run: --recursive / --no-recursive
+#
+# Default: true
+recursive = true
+
+# decrypt  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# When true, SecureString parameters are automatically decrypted.
+# Requires your IAM role/user to have:
+#   ssm:GetParameter with kms:Decrypt on the associated KMS key.
+#
+# When false, SecureString values are shown as:
+#   🔒 (SecureString — use --decrypt to fetch)
+#
+# WARNING: Setting this to true means ALL commands will fetch plaintext
+# secrets by default. Combine with  display.conceal = true  (below) to
+# avoid accidental exposure in terminals.
+#
+# Override per-run: --decrypt / --no-decrypt
+#
+# Default: false
+decrypt = false
+
+# fetch_strategy  ("auto" | "path" | "batch")
+# ───────────────────────────────────────────────────────────────────────────
+# Controls how parameters are fetched from AWS.
+#
+#   auto  → tries fast batched fetch first, then falls back to path fetch if
+#           IAM denies DescribeParameters/GetParameters.
+#   path  → original behavior: GetParametersByPath only.
+#   batch → DescribeParameters gets names in pages of 50, then GetParameters
+#           fetches values in parallel batches of 10.
+#
+# AWS quota-aware defaults:
+#   - GetParameter/GetParameters/GetParametersByPath share 40 TPS by default.
+#   - DescribeParameters is 3 TPS by default.
+#   - Higher throughput can raise these quotas but may cost extra.
+#
+# Default: auto
+fetch_strategy = "auto"
+
+# fetch_workers  (1–32)
+# ───────────────────────────────────────────────────────────────────────────
+# Parallel worker count for fast batched GetParameters calls.
+#
+# Default: 4
+fetch_workers = 4
+
+# max_get_tps / max_describe_tps
+# ───────────────────────────────────────────────────────────────────────────
+# Client-side rate limits to avoid AWS throttling. Increase only if Parameter
+# Store higher throughput is enabled for the account + region.
+#
+# Defaults: max_get_tps = 20, max_describe_tps = 3
+max_get_tps = 20
+max_describe_tps = 3
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  [display]  —  Terminal output preferences
+# ─────────────────────────────────────────────────────────────────────────────
+[display]
+
+# conceal  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Controls how SecureString values are displayed AFTER they have been
+# decrypted (i.e. when decrypt = true or --decrypt was passed).
+#
+# When conceal = true  (recommended):
+#   Shows:  supe****  (21 chars)
+#   ↳  First 4 characters + **** + total character count.
+#   ↳  Lets you identify the secret at a glance without full exposure.
+#   ↳  Still useful for spotting wrong values ("that starts with 'prod'").
+#
+# When conceal = false  (--no-conceal):
+#   Shows:  super-secret-password-123
+#   ↳  Full plaintext — use only in secure/private terminals.
+#
+# NOTE: conceal has NO effect on non-SecureString parameters (String,
+# StringList). Those are always shown in full.
+#
+# Override per-run: --conceal / --no-conceal
+#
+# Default: true
+conceal = true
+
+# show_arn  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include an extra ARN column in the parameter table.
+#
+# ARN format:  arn:aws:ssm:eu-west-1:123456789012:parameter/myapp/DB_HOST
+# Useful when you need the full ARN for IAM policies or cross-account work.
+#
+# Override per-run: --show-arn / --no-show-arn
+#
+# Default: false
+show_arn = false
+
+# show_env_variable  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include ENV variable name column in table output.
+#
+# Default: true
+show_env_variable = true
+
+# show_value  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include parameter value column in table output.
+#
+# Default: true
+show_value = true
+
+# show_type  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include parameter type column in table output.
+#
+# Default: false
+show_type = false
+
+# show_full_path  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include full SSM parameter name/path in table output.
+# Example: /my/app/prod/DATABASE_URL
+#
+# Keep enabled when you need exact source path for each variable.
+#
+# Default: true
+show_full_path = true
+
+# show_version  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include parameter version column in table output.
+#
+# Default: false
+show_version = false
+
+# show_last_modified  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Include last modified date column in table output.
+#
+# Default: false
+show_last_modified = false
+
+# max_value_length  (integer, 10–500)
+# ───────────────────────────────────────────────────────────────────────────
+# Maximum number of characters to display in the "Value" column of the
+# parameter table. Longer values are truncated with "…".
+#
+# The full value is always available via:
+#   ssm-explorer get /full/path/PARAM_NAME
+#
+# Suggested values:
+#   60   → compact, good for many params on smaller terminals
+#   80   → default, fits comfortably on 120-char-wide terminals
+#   120  → wide terminals, shows more of long values (e.g. URLs, tokens)
+#
+# Default: 80
+max_value_length = 80
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  [filter]  —  Interactive live-filter browser  (ssm-explorer browse)
+# ─────────────────────────────────────────────────────────────────────────────
+[filter]
+
+# enabled  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Allow the interactive live-filter browser command.
+# Set to false to disable it entirely (e.g. in CI/CD environments where
+# an interactive terminal is not available).
+#
+# Default: true
+enabled = true
+
+# default_mode  ("name" | "value")
+# ───────────────────────────────────────────────────────────────────────────
+# The filter mode the browser starts in when you run  ssm-explorer browse.
+#
+# "name"   → browser opens filtering by ENV variable name
+#              e.g. typing "DB" shows DATABASE_URL, DB_HOST, DB_PORT
+#
+# "value"  → browser opens filtering by parameter value
+#              e.g. typing "postgres" shows params whose value contains it
+#              NOTE: only works with decrypted values; SecureString
+#              parameters must be fetched with --decrypt.
+#
+# You can always toggle between modes with the Tab key while browsing.
+#
+# Default: "name"
+default_mode = "name"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  [output]  —  File saving (opt-in, disabled by default)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+#  READ-ONLY DEFAULT
+#  By default, the tool never writes to disk. File saving is explicitly
+#  opt-in: you must set  save = true  here before --output-file will work.
+#
+#  Printing to stdout (no file) is ALWAYS allowed regardless of this section.
+#
+[output]
+
+# save  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# Master switch — must be true for any file output to be permitted.
+#
+# When false (default):
+#   ssm-explorer export /path --output-file .env  → error: saving disabled
+#   ssm-explorer export /path                     → prints to stdout (ok)
+#
+# When true:
+#   ssm-explorer export /path --output-file .env  → writes .env file
+#   ssm-explorer export /path                     → still prints to stdout
+#
+# You can also set a default output path below so --output-file is optional.
+#
+# Default: false
+save = false
+
+# path  (string)
+# ───────────────────────────────────────────────────────────────────────────
+# Default output file path used when  save = true  and --output-file is
+# not passed explicitly at runtime.
+#
+# Examples:
+#   "/home/user/projects/myapp/.env"    → write dotenv file here
+#   "/home/user/exports/params.json"    → write JSON file here
+#   ""                                  → (empty) --output-file required each run
+#
+# Override per-run: --output-file /path/to/file
+#
+# Default: ""  (empty — --output-file argument is required when save = true)
+path = ""
+
+# format  ("env" | "json")
+# ───────────────────────────────────────────────────────────────────────────
+# The default export format when saving to a file or printing to stdout.
+#
+# "env"   → dotenv format, one variable per line:
+#             DATABASE_URL=postgres://localhost:5432/mydb
+#             REDIS_HOST=my-redis.cache.amazonaws.com
+#             API_KEY=****  (use --decrypt to include real value)
+#
+# "json"  → JSON array format:
+#             [
+#               {
+#                 "name": "/myapp/production/DATABASE_URL",
+#                 "env_variable": "DATABASE_URL",
+#                 "value": "postgres://localhost:5432/mydb",
+#                 "type": "String",
+#                 ...
+#               }
+#             ]
+#
+# Override per-run: --format env|json
+#
+# Default: "env"
+format = "env"
+
+# overwrite  (true | false)
+# ───────────────────────────────────────────────────────────────────────────
+# If the output file already exists, overwrite it without prompting.
+#
+# When false (default):
+#   ssm-explorer export /path --output-file .env  → error if .env exists
+#
+# When true:
+#   ssm-explorer export /path --output-file .env  → silently overwrites .env
+#
+# Override per-run: --overwrite / --no-overwrite
+#
+# Default: false
+overwrite = false
