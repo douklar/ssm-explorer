@@ -618,7 +618,8 @@ def _load_toml(path: Path) -> dict[str, Any]:
         return {}
     try:
         with path.open("rb") as fh:
-            return tomllib.load(fh)
+            result: dict[str, Any] = tomllib.load(fh)
+            return result
     except (OSError, tomllib.TOMLDecodeError) as exc:
         # Surface the error so the user can fix their config file
         raise ValueError(

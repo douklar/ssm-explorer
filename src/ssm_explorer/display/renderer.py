@@ -241,7 +241,7 @@ def render_multi_source_parameter_table(
         table.add_column("ARN", style="muted", max_width=60)
 
     for profile, region, param in rows:
-        row = [profile, region]
+        row: list[str | Text] = [profile, region]
         row.extend(
             _build_table_row(
                 param,
