@@ -32,8 +32,9 @@ jobs:
         run: pipx install poetry
 
       - name: Sync Lockfile if Outdated
+        if: matrix.python-version == '3.12'
         run: |
-          poetry lock --no-update
+          poetry lock
           if [ -n "$(git status --porcelain poetry.lock)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
