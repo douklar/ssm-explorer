@@ -91,7 +91,8 @@ def test_apply_env_overrides_parses_aws_profile_from_env_settings(
     monkeypatch: pytest.MonkeyPatch,
 ):
     monkeypatch.setenv("SSM_EXPLORER_AWS_PROFILE_FROM_ENV_TAGS", "Environment, APP_ENV")
-    monkeypatch.setenv("SSM_EXPLORER_AWS_PROFILE_FROM_ENV_VALUE_MAP",
+    monkeypatch.setenv(
+        "SSM_EXPLORER_AWS_PROFILE_FROM_ENV_VALUE_MAP",
         "myapp-prod=prod_account,myapp-dev=dev_account",
     )
 
@@ -238,7 +239,7 @@ def test_resolve_config_path_falls_back_to_local_config(
     tmp_path: Path,
 ):
     local_cfg = tmp_path / "config.toml"
-    local_cfg.write_text("[aws]\nprofile = \"x\"\nregion = \"y\"\n", encoding="utf-8")
+    local_cfg.write_text('[aws]\nprofile = "x"\nregion = "y"\n', encoding="utf-8")
 
     import ssm_explorer.config as cfg_mod
 

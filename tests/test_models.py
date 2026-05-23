@@ -50,8 +50,8 @@ class TestSSMParameter:
         param = SSMParameter(name="/a/B", value="super-secret", type=ParameterType.SECURE_STRING)
         result = param.display_value(decrypt=True, conceal=True)
         assert "****" in result
-        assert "supe" in result          # first 4 chars visible
-        assert "12 chars" in result      # char count
+        assert "supe" in result  # first 4 chars visible
+        assert "12 chars" in result  # char count
 
     def test_display_value_full_when_no_conceal(self):
         param = SSMParameter(name="/a/B", value="super-secret", type=ParameterType.SECURE_STRING)
@@ -61,7 +61,7 @@ class TestSSMParameter:
         param = SSMParameter(name="/a/B", value="abc", type=ParameterType.SECURE_STRING)
         result = param.display_value(decrypt=True, conceal=True)
         assert "****" in result
-        assert "abc" not in result       # too short to reveal prefix
+        assert "abc" not in result  # too short to reveal prefix
 
     def test_display_value_plain_string_not_concealed(self):
         param = SSMParameter(name="/a/B", value="plaintext", type=ParameterType.STRING)
@@ -93,6 +93,7 @@ class TestSSMParameter:
 
     def test_in_memory_encryption_disabled(self):
         from ssm_explorer.config import cfg
+
         cfg.security.in_memory_encryption = False
         param = SSMParameter(name="/a/MY_VAR", value="supersecret", type=ParameterType.STRING)
         assert param.value == "supersecret"
@@ -100,6 +101,7 @@ class TestSSMParameter:
 
     def test_in_memory_encryption_enabled(self):
         from ssm_explorer.config import cfg
+
         cfg.security.in_memory_encryption = True
         try:
             param = SSMParameter(name="/a/MY_VAR", value="supersecret", type=ParameterType.STRING)

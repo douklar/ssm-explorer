@@ -107,7 +107,9 @@ def test_deepsearch_prints_source_indicators_and_profile_region_columns(monkeypa
 
 def test_deepsearch_no_match_still_prints_source_indicators(monkeypatch):
     class NoMatchClient(FakeSSMClient):
-        def get_parameters_by_path(self, path: str, *, recursive: bool, decrypt: bool, strategy: str = "path") -> SearchResult:
+        def get_parameters_by_path(
+            self, path: str, *, recursive: bool, decrypt: bool, strategy: str = "path"
+        ) -> SearchResult:
             self.calls.append(
                 {
                     "profile": self.profile,

@@ -32,7 +32,10 @@ class TestSSMClientInit:
                 SSMClient(profile="bad-profile", region="us-east-1")
 
     def test_pins_profile_in_botocore_session(self):
-        with patch("botocore.session.Session") as mock_botocore_session, patch("boto3.Session") as mock_boto3_session:
+        with (
+            patch("botocore.session.Session") as mock_botocore_session,
+            patch("boto3.Session") as mock_boto3_session,
+        ):
             mock_boto3_session.return_value.client.return_value = MagicMock()
 
             SSMClient(profile="my-profile", region="eu-west-1")
@@ -81,10 +84,12 @@ class TestGetParametersByPath:
         mock_boto = MagicMock()
         mock_paginator = MagicMock()
         mock_boto.get_paginator.return_value = mock_paginator
-        mock_paginator.paginate.return_value = iter([
-            {"Parameters": [raw1]},
-            {"Parameters": [raw2]},
-        ])
+        mock_paginator.paginate.return_value = iter(
+            [
+                {"Parameters": [raw1]},
+                {"Parameters": [raw2]},
+            ]
+        )
 
         client = self._make_client(mock_boto)
         result = client.get_parameters_by_path("/test")
@@ -93,8 +98,7 @@ class TestGetParametersByPath:
 
     def test_batch_strategy_describes_names_and_fetches_values(self, make_raw_param):
         raws = [
-            make_raw_param(name=f"/test/PARAM_{index:02d}", value=str(index))
-            for index in range(12)
+            make_raw_param(name=f"/test/PARAM_{index:02d}", value=str(index)) for index in range(12)
         ]
         mock_boto = MagicMock()
         mock_boto.describe_parameters.return_value = {
@@ -122,9 +126,7 @@ class TestGetParametersByPath:
         )
 
         assert result.total_count == 12
-        assert [param.name for param in result.parameters] == [
-            raw["Name"] for raw in raws
-        ]
+        assert [param.name for param in result.parameters] == [raw["Name"] for raw in raws]
         mock_boto.describe_parameters.assert_called_once_with(
             ParameterFilters=[
                 {
@@ -206,4 +208,5 @@ class TestGetParameter:
 @pytest.fixture
 def make_raw_param():
     from tests.conftest import make_raw_param as _factory
+
     return _factory

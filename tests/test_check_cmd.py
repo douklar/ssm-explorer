@@ -37,7 +37,9 @@ def test_check_passes_with_valid_profile_and_region(
 ) -> None:
     config_file = _write_config(tmp_path)
 
-    monkeypatch.setattr("ssm_explorer.commands.check_cmd.shutil.which", lambda _: "/bin/ssm-explorer")
+    monkeypatch.setattr(
+        "ssm_explorer.commands.check_cmd.shutil.which", lambda _: "/bin/ssm-explorer"
+    )
     monkeypatch.setattr(
         "ssm_explorer.commands.check_cmd.botocore.session.Session",
         lambda: FakeBotocoreSession(),
@@ -56,7 +58,9 @@ def test_check_fails_when_profile_missing(
 ) -> None:
     config_file = _write_config(tmp_path)
 
-    monkeypatch.setattr("ssm_explorer.commands.check_cmd.shutil.which", lambda _: "/bin/ssm-explorer")
+    monkeypatch.setattr(
+        "ssm_explorer.commands.check_cmd.shutil.which", lambda _: "/bin/ssm-explorer"
+    )
     monkeypatch.setattr(
         "ssm_explorer.commands.check_cmd.botocore.session.Session",
         lambda: FakeBotocoreSession(profiles=["dev"]),

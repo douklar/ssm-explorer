@@ -65,7 +65,9 @@ def test_search_defaults_to_three_table_columns_even_with_stale_config(monkeypat
         captured["kwargs"] = kwargs
 
     monkeypatch.setattr("ssm_explorer.commands.search_cmd.SSMClient", FakeSSMClient)
-    monkeypatch.setattr("ssm_explorer.commands.search_cmd.render_parameter_table", fake_render_parameter_table)
+    monkeypatch.setattr(
+        "ssm_explorer.commands.search_cmd.render_parameter_table", fake_render_parameter_table
+    )
     monkeypatch.setattr("ssm_explorer.commands.search_cmd.cfg", _stale_config_with_extra_columns())
 
     result = runner.invoke(
@@ -95,7 +97,9 @@ def test_search_extra_columns_require_explicit_flags(monkeypatch):
         captured["kwargs"] = kwargs
 
     monkeypatch.setattr("ssm_explorer.commands.search_cmd.SSMClient", FakeSSMClient)
-    monkeypatch.setattr("ssm_explorer.commands.search_cmd.render_parameter_table", fake_render_parameter_table)
+    monkeypatch.setattr(
+        "ssm_explorer.commands.search_cmd.render_parameter_table", fake_render_parameter_table
+    )
     monkeypatch.setattr("ssm_explorer.commands.search_cmd.cfg", _stale_config_with_extra_columns())
 
     result = runner.invoke(
@@ -128,7 +132,9 @@ def test_list_defaults_to_three_table_columns_even_with_stale_config(monkeypatch
         captured["kwargs"] = kwargs
 
     monkeypatch.setattr("ssm_explorer.commands.list_cmd.SSMClient", FakeSSMClient)
-    monkeypatch.setattr("ssm_explorer.commands.list_cmd.render_parameter_table", fake_render_parameter_table)
+    monkeypatch.setattr(
+        "ssm_explorer.commands.list_cmd.render_parameter_table", fake_render_parameter_table
+    )
     monkeypatch.setattr("ssm_explorer.commands.list_cmd.cfg", _stale_config_with_extra_columns())
 
     result = runner.invoke(

@@ -33,10 +33,10 @@ from ssm_explorer.display import console
 HELP_ACCENT = "#5b7fbf"
 
 typer_rich_utils.STYLE_COMMANDS_PANEL_BORDER = HELP_ACCENT
-typer_rich_utils.STYLE_COMMANDS_TABLE_BORDER_STYLE = f"dim {HELP_ACCENT}"
+typer_rich_utils.__dict__["STYLE_COMMANDS_TABLE_BORDER_STYLE"] = f"dim {HELP_ACCENT}"
 typer_rich_utils.STYLE_COMMANDS_TABLE_FIRST_COLUMN = f"bold {HELP_ACCENT}"
 typer_rich_utils.STYLE_OPTIONS_PANEL_BORDER = HELP_ACCENT
-typer_rich_utils.STYLE_OPTIONS_TABLE_BORDER_STYLE = f"dim {HELP_ACCENT}"
+typer_rich_utils.__dict__["STYLE_OPTIONS_TABLE_BORDER_STYLE"] = f"dim {HELP_ACCENT}"
 typer_rich_utils.STYLE_OPTION = f"bold {HELP_ACCENT}"
 typer_rich_utils.STYLE_SWITCH = f"bold {HELP_ACCENT}"
 typer_rich_utils.STYLE_USAGE_COMMAND = f"bold {HELP_ACCENT}"
