@@ -31,16 +31,18 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
 
-      - name: Cache Poetry virtualenv
+      - name: Cache Poetry cache
         uses: actions/cache@v4
-        id: cache-deps
         with:
-          path: .venv
-          key: pydeps-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            poetry-cache-${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: |
           poetry config virtualenvs.in-project true
+          poetry env use python
           poetry install --no-interaction
 
       - name: Ruff lint
