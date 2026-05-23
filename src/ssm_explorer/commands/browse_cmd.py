@@ -45,8 +45,7 @@ def browse_command(
         str | None,
         typer.Argument(
             help=(
-                "SSM path prefix to browse. "
-                "Falls back to search.default_path in config if omitted."
+                "SSM path prefix to browse. Falls back to search.default_path in config if omitted."
             ),
             metavar="PATH",
         ),
@@ -81,7 +80,8 @@ def browse_command(
     output: Annotated[
         str,
         typer.Option(
-            "--output", "-o",
+            "--output",
+            "-o",
             help="What to show after selecting: 'detail' (default), 'value', 'json'.",
             metavar="FORMAT",
         ),
@@ -126,10 +126,10 @@ def browse_command(
         )
         raise typer.Exit(code=1)
 
-    resolved_path    = active.resolve_path(path, resolved_profile)
-    resolved_decrypt = decrypt   if decrypt   is not None else defaults.search.decrypt
+    resolved_path = active.resolve_path(path, resolved_profile)
+    resolved_decrypt = decrypt if decrypt is not None else defaults.search.decrypt
     resolved_recurse = recursive if recursive is not None else defaults.search.recursive
-    resolved_conceal = conceal   if conceal   is not None else defaults.display.conceal
+    resolved_conceal = conceal if conceal is not None else defaults.display.conceal
 
     if not resolved_path:
         print_error(
@@ -139,9 +139,7 @@ def browse_command(
         raise typer.Exit(code=1)
 
     if not resolved_decrypt:
-        print_warning(
-            "SecureString values are masked. Use --decrypt to filter/view by value."
-        )
+        print_warning("SecureString values are masked. Use --decrypt to filter/view by value.")
 
     # ── Load parameters from AWS (read-only) ─────────────────────────────
     try:
@@ -179,9 +177,7 @@ def browse_command(
     from ssm_explorer.display.interactive import FilterMode, run_interactive_filter
 
     # Respect filter.default_mode from config
-    initial_mode = (
-        FilterMode.VALUE if defaults.filter.default_mode == "value" else FilterMode.NAME
-    )
+    initial_mode = FilterMode.VALUE if defaults.filter.default_mode == "value" else FilterMode.NAME
 
     try:
         selected = run_interactive_filter(result, initial_mode=initial_mode)

@@ -124,11 +124,11 @@ def list_command(
         print_error(str(exc))
         raise typer.Exit(code=1) from exc
     defaults = active.defaults_for_profiles(resolved_profile)
-    resolved_path    = active.resolve_path(path, resolved_profile)
-    resolved_decrypt = decrypt   if decrypt  is not None else defaults.search.decrypt
+    resolved_path = active.resolve_path(path, resolved_profile)
+    resolved_decrypt = decrypt if decrypt is not None else defaults.search.decrypt
     resolved_recurse = recursive if recursive is not None else defaults.search.recursive
-    resolved_conceal = conceal   if conceal  is not None else defaults.display.conceal
-    resolved_arn     = show_arn  if show_arn is not None else defaults.display.show_arn
+    resolved_conceal = conceal if conceal is not None else defaults.display.conceal
+    resolved_arn = show_arn if show_arn is not None else defaults.display.show_arn
     resolved_show_type = bool(show_type)
     resolved_show_version = bool(show_version)
     resolved_show_last_modified = bool(show_last_modified)

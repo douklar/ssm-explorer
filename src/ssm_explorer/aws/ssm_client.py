@@ -274,9 +274,7 @@ class SSMClient:
         Rate limiters keep this below default Parameter Store TPS quotas.
         """
         metadata = self._describe_parameters_by_path(path, recursive=recursive)
-        names = sorted(
-            {str(item["Name"]) for item in metadata if item.get("Name")}
-        )
+        names = sorted({str(item["Name"]) for item in metadata if item.get("Name")})
         if not names:
             return SearchResult(
                 path=path,
@@ -287,9 +285,7 @@ class SSMClient:
             )
 
         raw_params = self._get_parameters_by_names(names, decrypt=decrypt)
-        metadata_by_name = {
-            str(item["Name"]): item for item in metadata if item.get("Name")
-        }
+        metadata_by_name = {str(item["Name"]): item for item in metadata if item.get("Name")}
         raw_by_name = {
             str(item["Name"]): {**metadata_by_name.get(str(item["Name"]), {}), **item}
             for item in raw_params
@@ -346,9 +342,7 @@ class SSMClient:
                     "Check your ~/.aws/config or ~/.aws/credentials file."
                 ) from exc
             except (BotoCoreError, Exception) as exc:
-                raise SSMClientError(
-                    f"Unexpected error communicating with AWS SSM: {exc}"
-                ) from exc
+                raise SSMClientError(f"Unexpected error communicating with AWS SSM: {exc}") from exc
 
             parameters.extend(cast(list[dict[str, Any]], response.get("Parameters", [])))
             next_token = response.get("NextToken")
@@ -406,9 +400,7 @@ class SSMClient:
                 "Check your ~/.aws/config or ~/.aws/credentials file."
             ) from exc
         except (BotoCoreError, Exception) as exc:
-            raise SSMClientError(
-                f"Unexpected error communicating with AWS SSM: {exc}"
-            ) from exc
+            raise SSMClientError(f"Unexpected error communicating with AWS SSM: {exc}") from exc
 
         raise SSMClientError("Unreachable")  # pragma: no cover
 

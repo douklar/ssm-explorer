@@ -66,16 +66,25 @@ app = typer.Typer(
 )
 
 # ── Leaf commands ────────────────────────────────────────────────────────────
-app.command("list",   help="List parameters. Use: ssm-explorer list example")(list_command)
+app.command("list", help="List parameters. Use: ssm-explorer list example")(list_command)
 app.command("search", help="Filter parameters. Use: ssm-explorer search example")(search_command)
-app.command("deepsearch", help="Deep search across accounts/regions from root path. Use: ssm-explorer deepsearch example")(deepsearch_command)
-app.command("get",    help="Get one parameter. Use: ssm-explorer get example")(get_command)
+app.command(
+    "deepsearch",
+    help="Deep search across accounts/regions from root path. Use: ssm-explorer deepsearch example",
+)(deepsearch_command)
+app.command("get", help="Get one parameter. Use: ssm-explorer get example")(get_command)
 app.command("export", help="Export parameters. Use: ssm-explorer export example")(export_command)
 app.command("browse", help="Interactive browser. Use: ssm-explorer browse example")(browse_command)
-app.command("diff",   help="Compare parameters. Use: ssm-explorer diff example")(diff_command)
-app.command("check",  help="Validate install, config, AWS profile, region, and CLI commands.")(check_command)
-app.command("install", help="Install local Poetry wrapper so ssm-explorer runs from any directory.")(install_command)
-app.command("uninstall", help="Remove local Poetry wrapper installed by ssm-explorer install.")(uninstall_command)
+app.command("diff", help="Compare parameters. Use: ssm-explorer diff example")(diff_command)
+app.command("check", help="Validate install, config, AWS profile, region, and CLI commands.")(
+    check_command
+)
+app.command(
+    "install", help="Install local Poetry wrapper so ssm-explorer runs from any directory."
+)(install_command)
+app.command("uninstall", help="Remove local Poetry wrapper installed by ssm-explorer install.")(
+    uninstall_command
+)
 
 # ── Sub-app: config ──────────────────────────────────────────────────────────
 app.add_typer(
@@ -93,8 +102,7 @@ app.add_typer(
 def _version_callback(value: bool) -> None:
     if value:
         console.print(
-            f"[bold #5b7fbf]ssm-explorer[/bold #5b7fbf] "
-            f"[bright_white]v{__version__}[/bright_white]"
+            f"[bold #5b7fbf]ssm-explorer[/bold #5b7fbf] [bright_white]v{__version__}[/bright_white]"
         )
         raise typer.Exit()
 

@@ -59,7 +59,8 @@ def get_command(
     output: Annotated[
         str,
         typer.Option(
-            "--output", "-o",
+            "--output",
+            "-o",
             help="Output format: 'detail' (rich panel), 'value' (raw only), 'json'.",
             metavar="FORMAT",
         ),
@@ -93,8 +94,8 @@ def get_command(
         print_error(str(exc))
         raise typer.Exit(code=1) from exc
     defaults = active.defaults_for_profiles(resolved_profile)
-    resolved_decrypt = decrypt  if decrypt is not None else defaults.search.decrypt
-    resolved_conceal = conceal  if conceal is not None else defaults.display.conceal
+    resolved_decrypt = decrypt if decrypt is not None else defaults.search.decrypt
+    resolved_conceal = conceal if conceal is not None else defaults.display.conceal
 
     try:
         client = SSMClient(

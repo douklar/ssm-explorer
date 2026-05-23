@@ -85,7 +85,12 @@ def deepsearch_command(
     ] = None,
     filter_value: Annotated[
         str | None,
-        typer.Option("--filter-value", "-v", help="Match parameter value (case-insensitive).", metavar="PATTERN"),
+        typer.Option(
+            "--filter-value",
+            "-v",
+            help="Match parameter value (case-insensitive).",
+            metavar="PATTERN",
+        ),
     ] = None,
     decrypt: Annotated[
         bool | None,
@@ -224,7 +229,9 @@ def deepsearch_command(
         return
 
     console.print()
-    console.print(f"  [dim]Sources searched:[/dim] [bright_cyan]{', '.join(source_labels)}[/bright_cyan]")
+    console.print(
+        f"  [dim]Sources searched:[/dim] [bright_cyan]{', '.join(source_labels)}[/bright_cyan]"
+    )
     matched_text = ", ".join(sorted(matched_sources)) if matched_sources else "(none)"
     console.print(f"  [dim]Matched sources:[/dim] [bright_magenta]{matched_text}[/bright_magenta]")
     console.print(

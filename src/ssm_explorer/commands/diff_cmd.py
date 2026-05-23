@@ -55,7 +55,12 @@ def diff_command(
     ] = None,
     region: Annotated[
         str | None,
-        typer.Option("--region", "-r", help="AWS region for both sources unless --region-a/--region-b is set.", metavar="REGION"),
+        typer.Option(
+            "--region",
+            "-r",
+            help="AWS region for both sources unless --region-a/--region-b is set.",
+            metavar="REGION",
+        ),
     ] = None,
     region_a: Annotated[
         str | None,
@@ -89,7 +94,11 @@ def diff_command(
     # ── Fetch options ────────────────────────────────────────────────────
     decrypt: Annotated[
         bool | None,
-        typer.Option("--decrypt/--no-decrypt", "-d/-D", help="Decrypt SecureString values to compare contents."),
+        typer.Option(
+            "--decrypt/--no-decrypt",
+            "-d/-D",
+            help="Decrypt SecureString values to compare contents.",
+        ),
     ] = None,
     recursive: Annotated[
         bool | None,
@@ -173,8 +182,7 @@ def diff_command(
 
         # If profile_b/region_b are missing, fall back to profile_a/region_a.
         res_prof_b, res_reg_b = active.resolve_aws(
-            profile_b or res_prof_a,
-            region_b or region or (res_reg_a if not profile_b else None)
+            profile_b or res_prof_a, region_b or region or (res_reg_a if not profile_b else None)
         )
     except ValueError as exc:
         print_error(str(exc))
@@ -202,9 +210,9 @@ def diff_command(
         print_error("No path provided or found in config for one of the sources.")
         raise typer.Exit(code=1)
 
-    res_decrypt   = decrypt   if decrypt   is not None else defaults.search.decrypt
-    res_recurse   = recursive if recursive is not None else defaults.search.recursive
-    res_conceal   = conceal   if conceal   is not None else defaults.display.conceal
+    res_decrypt = decrypt if decrypt is not None else defaults.search.decrypt
+    res_recurse = recursive if recursive is not None else defaults.search.recursive
+    res_conceal = conceal if conceal is not None else defaults.display.conceal
 
     # Ensure at least SOMETHING is different between A and B
     if res_path_a == res_path_b and res_prof_a == res_prof_b and res_reg_a == res_reg_b:
@@ -268,17 +276,33 @@ def diff_command(
         p_b = map_b.get(key)
 
         if p_a and not p_b:
-            diffs.append(ParameterDiff(env_variable=key, status=DiffStatus.MISSING_IN_B, param_a=p_a, param_b=None))
+            diffs.append(
+                ParameterDiff(
+                    env_variable=key, status=DiffStatus.MISSING_IN_B, param_a=p_a, param_b=None
+                )
+            )
         elif p_b and not p_a:
-            diffs.append(ParameterDiff(env_variable=key, status=DiffStatus.MISSING_IN_A, param_a=None, param_b=p_b))
+            diffs.append(
+                ParameterDiff(
+                    env_variable=key, status=DiffStatus.MISSING_IN_A, param_a=None, param_b=p_b
+                )
+            )
         elif p_a and p_b:
             # Check equality.
             # If not decrypted, we can't reliably diff SecureString values.
             # We assume they match unless types differ, but visually it will show as ***
             if p_a.type != p_b.type or p_a.value != p_b.value:
-                diffs.append(ParameterDiff(env_variable=key, status=DiffStatus.CHANGED, param_a=p_a, param_b=p_b))
+                diffs.append(
+                    ParameterDiff(
+                        env_variable=key, status=DiffStatus.CHANGED, param_a=p_a, param_b=p_b
+                    )
+                )
             else:
-                diffs.append(ParameterDiff(env_variable=key, status=DiffStatus.IDENTICAL, param_a=p_a, param_b=p_b))
+                diffs.append(
+                    ParameterDiff(
+                        env_variable=key, status=DiffStatus.IDENTICAL, param_a=p_a, param_b=p_b
+                    )
+                )
 
     rows = diffs
     if exc_identicals:
@@ -293,15 +317,25 @@ def diff_command(
 
     src_a_text = Text.assemble(
         ("Source A\n", "bold #5b7fbf"),
-        ("Path:    ", "dim white"), (res_path_a, "#d8dee9"), ("\n", ""),
-        ("Profile: ", "dim white"), (res_prof_a, "bright_yellow"), ("\n", ""),
-        ("Region:  ", "dim white"), (res_reg_a, "bright_green"),
+        ("Path:    ", "dim white"),
+        (res_path_a, "#d8dee9"),
+        ("\n", ""),
+        ("Profile: ", "dim white"),
+        (res_prof_a, "bright_yellow"),
+        ("\n", ""),
+        ("Region:  ", "dim white"),
+        (res_reg_a, "bright_green"),
     )
     src_b_text = Text.assemble(
         ("Source B\n", "bold bright_magenta"),
-        ("Path:    ", "dim white"), (res_path_b, "#d8dee9"), ("\n", ""),
-        ("Profile: ", "dim white"), (res_prof_b, "bright_yellow"), ("\n", ""),
-        ("Region:  ", "dim white"), (res_reg_b, "bright_green"),
+        ("Path:    ", "dim white"),
+        (res_path_b, "#d8dee9"),
+        ("\n", ""),
+        ("Profile: ", "dim white"),
+        (res_prof_b, "bright_yellow"),
+        ("\n", ""),
+        ("Region:  ", "dim white"),
+        (res_reg_b, "bright_green"),
     )
 
     console.print()
@@ -322,7 +356,7 @@ def diff_command(
         rows,
         decrypt=res_decrypt,
         conceal=res_conceal,
-        max_value_length=defaults.display.max_value_length
+        max_value_length=defaults.display.max_value_length,
     )
 
     # Summary

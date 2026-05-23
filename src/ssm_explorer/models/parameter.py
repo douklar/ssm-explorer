@@ -57,7 +57,6 @@ def _conceal_value(value: str) -> str:
     return f"{prefix}****  ({total} chars)"
 
 
-
 class ParameterType(str, Enum):
     """AWS SSM Parameter types."""
 
@@ -83,6 +82,7 @@ class SSMParameter(BaseModel):
         encrypt = False
         try:
             from ssm_explorer.config import cfg
+
             encrypt = bool(cfg.security.in_memory_encryption)
         except Exception:
             pass
@@ -95,6 +95,7 @@ class SSMParameter(BaseModel):
             encrypt = False
             try:
                 from ssm_explorer.config import cfg
+
                 encrypt = bool(cfg.security.in_memory_encryption)
             except Exception:
                 pass
@@ -191,7 +192,9 @@ class SSMParameter(BaseModel):
                      exports always contain full values (the caller already
                      decided to decrypt and export).
         """
-        value = self.display_value(decrypt=True, conceal=conceal) if self.is_encrypted else self.value
+        value = (
+            self.display_value(decrypt=True, conceal=conceal) if self.is_encrypted else self.value
+        )
         return {
             "name": self.name,
             "env_variable": self.env_variable_name,
@@ -221,9 +224,7 @@ class SearchResult(BaseModel):
     def filter_by_name(self, pattern: str) -> SearchResult:
         """Return a new SearchResult filtered by case-insensitive name pattern."""
         pattern_lower = pattern.lower()
-        filtered = [
-            p for p in self.parameters if pattern_lower in p.env_variable_name.lower()
-        ]
+        filtered = [p for p in self.parameters if pattern_lower in p.env_variable_name.lower()]
         return SearchResult(
             path=self.path,
             parameters=filtered,
@@ -272,15 +273,19 @@ class SearchResult(BaseModel):
 # Diff models
 # ---------------------------------------------------------------------------
 
+
 class DiffStatus(str, Enum):
     """Status of a parameter comparison between two environments."""
-    IDENTICAL = "IDENTICAL"       # Exists in both, values and types match
-    CHANGED = "CHANGED"           # Exists in both, but value or type differs
-    MISSING_IN_A = "MISSING_IN_A" # Exists in B, but not in A
-    MISSING_IN_B = "MISSING_IN_B" # Exists in A, but not in B
+
+    IDENTICAL = "IDENTICAL"  # Exists in both, values and types match
+    CHANGED = "CHANGED"  # Exists in both, but value or type differs
+    MISSING_IN_A = "MISSING_IN_A"  # Exists in B, but not in A
+    MISSING_IN_B = "MISSING_IN_B"  # Exists in A, but not in B
+
 
 class ParameterDiff(BaseModel):
     """Represents the difference of a single parameter across two environments."""
+
     env_variable: str
     status: DiffStatus
     param_a: SSMParameter | None = None

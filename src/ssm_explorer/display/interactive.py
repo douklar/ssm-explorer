@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 
 class FilterMode(Enum):
-    NAME = auto()   # filter by ENV variable name
+    NAME = auto()  # filter by ENV variable name
     VALUE = auto()  # filter by parameter value
 
     def label(self) -> str:
@@ -63,29 +63,29 @@ class _InteractiveState(TypedDict):
 _STYLE = Style.from_dict(
     {
         # chrome
-        "header":          "bg:#1e3a5f bold",
-        "header.title":    "bg:#1e3a5f #00d7ff bold",
-        "header.path":     "bg:#1e3a5f #87ff87",
-        "header.hint":     "bg:#1e3a5f #888888",
-        "footer":          "bg:#1a1a2e #666666",
-        "separator":       "#1e3a5f",
+        "header": "bg:#1e3a5f bold",
+        "header.title": "bg:#1e3a5f #00d7ff bold",
+        "header.path": "bg:#1e3a5f #87ff87",
+        "header.hint": "bg:#1e3a5f #888888",
+        "footer": "bg:#1a1a2e #666666",
+        "separator": "#1e3a5f",
         # mode badge
-        "mode.name":       "bg:#005f87 #ffffff bold",
-        "mode.value":      "bg:#5f0087 #ffffff bold",
+        "mode.name": "bg:#005f87 #ffffff bold",
+        "mode.value": "bg:#5f0087 #ffffff bold",
         # search box
-        "search.label":    "#888888",
-        "search.cursor":   "#00d7ff",
+        "search.label": "#888888",
+        "search.cursor": "#00d7ff",
         # list items
-        "item.selected":   "bg:#005f87 #ffffff bold",
-        "item.normal":     "#cccccc",
-        "item.env":        "#ffff87 bold",
-        "item.value":      "#cccccc",
-        "item.match":      "bg:#875f00 #ffff87 bold",
-        "item.type.str":   "#87ff87",
-        "item.type.sec":   "#ff5f5f",
-        "item.type.list":  "#5fafff",
-        "counter":         "#666666",
-        "empty":           "#666666 italic",
+        "item.selected": "bg:#005f87 #ffffff bold",
+        "item.normal": "#cccccc",
+        "item.env": "#ffff87 bold",
+        "item.value": "#cccccc",
+        "item.match": "bg:#875f00 #ffff87 bold",
+        "item.type.str": "#87ff87",
+        "item.type.sec": "#ff5f5f",
+        "item.type.list": "#5fafff",
+        "counter": "#666666",
+        "empty": "#666666 italic",
     }
 )
 
@@ -125,12 +125,12 @@ def run_interactive_filter(
 
     # Mutable state shared across callbacks
     state: _InteractiveState = {
-        "mode":     initial_mode,
-        "query":    "",
+        "mode": initial_mode,
+        "query": "",
         "filtered": list(all_params),
-        "cursor":   0,
+        "cursor": 0,
         "selected": None,
-        "done":     False,
+        "done": False,
     }
 
     # ------------------------------------------------------------------ #
@@ -160,29 +160,26 @@ def run_interactive_filter(
         total = len(all_params)
         shown = len(state["filtered"])
         return HTML(
-            f'<header>  🔍  SSM Explorer — Live Filter   '
-            f'<header.path>{result.path}</header.path>   '
-            f'<header.hint>Profile: {result.profile} • Region: {result.region}</header.hint>'
-            f'</header>\n'
-            f'  <{mode_cls}> Filter by: {mode.label()} </{mode_cls}>'
-            f'  <counter>[{shown}/{total}]</counter>'
-            f'  <header.hint>  Tab: toggle mode  •  ↑↓: navigate  •  Enter: select  •  Esc: quit</header.hint>'
+            f"<header>  🔍  SSM Explorer — Live Filter   "
+            f"<header.path>{result.path}</header.path>   "
+            f"<header.hint>Profile: {result.profile} • Region: {result.region}</header.hint>"
+            f"</header>\n"
+            f"  <{mode_cls}> Filter by: {mode.label()} </{mode_cls}>"
+            f"  <counter>[{shown}/{total}]</counter>"
+            f"  <header.hint>  Tab: toggle mode  •  ↑↓: navigate  •  Enter: select  •  Esc: quit</header.hint>"
         )
 
     def _search_prompt_text() -> HTML:
         mode: FilterMode = state["mode"]
         mode_cls = "mode.name" if mode is FilterMode.NAME else "mode.value"
-        return HTML(
-            f'  <{mode_cls}>{mode.label()}</{mode_cls}>'
-            f'  <search.label>❯ </search.label>'
-        )
+        return HTML(f"  <{mode_cls}>{mode.label()}</{mode_cls}>  <search.label>❯ </search.label>")
 
     def _list_text() -> HTML:
         params = state["filtered"]
         cursor: int = state["cursor"]
 
         if not params:
-            return HTML('<empty>  No matches found. Try a different query.</empty>\n')
+            return HTML("<empty>  No matches found. Try a different query.</empty>\n")
 
         query = state["query"].strip().lower()
         mode: FilterMode = state["mode"]
@@ -196,15 +193,15 @@ def run_interactive_filter(
             val = raw_val if len(raw_val) <= 60 else raw_val[:57] + "…"
 
             # Escape HTML special chars so prompt_toolkit doesn't misparse them
-            val_safe  = val.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            env_safe  = env.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            val_safe = val.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            env_safe = env.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
             is_concealed = p.is_encrypted and decrypted and conceal
 
             type_cls = {
-                "String":       "item.type.str",
+                "String": "item.type.str",
                 "SecureString": "item.type.sec",
-                "StringList":   "item.type.list",
+                "StringList": "item.type.list",
             }.get(p.type.value, "item.type.str")
             type_label = {"String": "STR", "SecureString": "SEC 🔒", "StringList": "LST"}.get(
                 p.type.value, "STR"
@@ -216,9 +213,7 @@ def run_interactive_filter(
                 row_cls = "item.selected"
                 prefix = "▶ "
                 line = (
-                    f'<{row_cls}>{prefix}'
-                    f'{env_safe:<30}  {val_safe:<60}  [{type_label}]'
-                    f'</{row_cls}>'
+                    f"<{row_cls}>{prefix}{env_safe:<30}  {val_safe:<60}  [{type_label}]</{row_cls}>"
                 )
             else:
                 prefix = "  "
@@ -226,50 +221,46 @@ def run_interactive_filter(
                     start = env.lower().find(query)
                     end = start + len(query)
                     env_hl = (
-                        f'<item.env>{env_safe[:start]}</item.env>'
-                        f'<item.match>{env_safe[start:end]}</item.match>'
-                        f'<item.env>{env_safe[end:]}</item.env>'
+                        f"<item.env>{env_safe[:start]}</item.env>"
+                        f"<item.match>{env_safe[start:end]}</item.match>"
+                        f"<item.env>{env_safe[end:]}</item.env>"
                     )
                 else:
-                    env_hl = f'<item.env>{env_safe}</item.env>'
+                    env_hl = f"<item.env>{env_safe}</item.env>"
 
-                if query and mode is FilterMode.VALUE and query in raw_val.lower() and not is_concealed:
+                if (
+                    query
+                    and mode is FilterMode.VALUE
+                    and query in raw_val.lower()
+                    and not is_concealed
+                ):
                     start = val_safe.lower().find(query)
                     end = start + len(query)
                     val_hl = (
-                        f'<{val_cls}>{val_safe[:start]}</{val_cls}>'
-                        f'<item.match>{val_safe[start:end]}</item.match>'
-                        f'<{val_cls}>{val_safe[end:]}</{val_cls}>'
+                        f"<{val_cls}>{val_safe[:start]}</{val_cls}>"
+                        f"<item.match>{val_safe[start:end]}</item.match>"
+                        f"<{val_cls}>{val_safe[end:]}</{val_cls}>"
                     )
                 else:
-                    val_hl = f'<{val_cls}>{val_safe}</{val_cls}>'
+                    val_hl = f"<{val_cls}>{val_safe}</{val_cls}>"
 
-                line = (
-                    f'{prefix}{env_hl}  '
-                    f'{val_hl}  '
-                    f'<{type_cls}>[{type_label}]</{type_cls}>'
-                )
+                line = f"{prefix}{env_hl}  {val_hl}  <{type_cls}>[{type_label}]</{type_cls}>"
 
             lines.append(line)
 
         return HTML("\n".join(lines) + "\n")
 
     def _column_header_text() -> HTML:
-        return HTML(
-            '  <header.hint>'
-            f'{"ENV VARIABLE":<32}  {"VALUE":<62}  TYPE'
-            '</header.hint>'
-        )
+        return HTML(f"  <header.hint>{'ENV VARIABLE':<32}  {'VALUE':<62}  TYPE</header.hint>")
 
     def _footer_text() -> HTML:
         p = state["filtered"]
         if p and 0 <= state["cursor"] < len(p):
             param = p[state["cursor"]]
             return HTML(
-                f'  Full path: <header.path>{param.name}</header.path>'
-                f'  •  Version: {param.version}'
+                f"  Full path: <header.path>{param.name}</header.path>  •  Version: {param.version}"
             )
-        return HTML('  No selection')
+        return HTML("  No selection")
 
     # ------------------------------------------------------------------ #
     # Layout

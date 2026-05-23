@@ -135,7 +135,10 @@ def render_parameter_table(
         (" parameter(s)", "dim white"),
     )
     if decrypt and conceal:
-        count_text.append("  🔒 SecureString values are concealed — use --no-conceal to reveal", style="dim yellow")
+        count_text.append(
+            "  🔒 SecureString values are concealed — use --no-conceal to reveal",
+            style="dim yellow",
+        )
     console.print(count_text)
     console.print()
 
@@ -298,9 +301,7 @@ def _build_table_row(
         ParameterType.STRING_LIST: ("StringList", "param.type.stringlist"),
         ParameterType.SECURE_STRING: ("SecureString 🔒", "param.type.secure"),
     }
-    type_label, type_style = type_styles.get(
-        param.type, (param.type.value, "param.type.string")
-    )
+    type_label, type_style = type_styles.get(param.type, (param.type.value, "param.type.string"))
     type_text = Text(type_label, style=type_style)
 
     # Version
@@ -356,7 +357,9 @@ def render_single_parameter(
     # Show a hint line below the value when concealed
     conceal_hint = ""
     if param.is_encrypted and decrypt and conceal:
-        conceal_hint = "\n  [dim yellow]  ↳ concealed — use --no-conceal to reveal full value[/dim yellow]"
+        conceal_hint = (
+            "\n  [dim yellow]  ↳ concealed — use --no-conceal to reveal full value[/dim yellow]"
+        )
 
     content = Text.assemble(
         ("\n  Full Name:     ", "dim white"),
@@ -418,6 +421,7 @@ def render_json(data: Sequence[JsonObject] | JsonObject) -> None:
 # Diff rendering
 # ---------------------------------------------------------------------------
 
+
 def render_diff_table(
     diffs: list[ParameterDiff],
     *,
@@ -452,9 +456,7 @@ def render_diff_table(
         def format_val(p: SSMParameter | None) -> Text:
             if not p:
                 return Text("-", style="dim")
-            display = p.display_value(
-                decrypt=decrypt, conceal=conceal, max_length=max_value_length
-            )
+            display = p.display_value(decrypt=decrypt, conceal=conceal, max_length=max_value_length)
             # Add type hint if it's not a standard String
             type_hint = ""
             if p.type != ParameterType.STRING:

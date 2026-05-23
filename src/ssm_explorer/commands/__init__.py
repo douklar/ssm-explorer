@@ -9,4 +9,13 @@ from ssm_explorer.commands.get_cmd import app as get_app
 from ssm_explorer.commands.list_cmd import app as list_app
 from ssm_explorer.commands.search_cmd import app as search_app
 
-__all__ = ["list_app", "search_app", "deepsearch_app", "get_app", "diff_command", "export_app", "browse_app", "config_app"]
+__all__ = [
+    "list_app",
+    "search_app",
+    "deepsearch_app",
+    "get_app",
+    "diff_command",
+    "export_app",
+    "browse_app",
+    "config_app",
+]

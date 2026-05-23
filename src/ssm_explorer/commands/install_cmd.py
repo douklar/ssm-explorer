@@ -37,11 +37,7 @@ def _validate_project_dir(project_dir: Path) -> Path:
 
 
 def _wrapper_content(project_dir: Path) -> str:
-    return (
-        "#!/usr/bin/env sh\n"
-        "set -eu\n"
-        f'exec poetry -C "{project_dir}" run {APP_NAME} "$@"\n'
-    )
+    return f'#!/usr/bin/env sh\nset -eu\nexec poetry -C "{project_dir}" run {APP_NAME} "$@"\n'
 
 
 def install_command(
@@ -90,8 +86,7 @@ def install_command(
 
     if wrapper.exists() and not force:
         print_warning(
-            f"Wrapper already exists: {_display_path(wrapper)}\n"
-            "Use --force to overwrite it."
+            f"Wrapper already exists: {_display_path(wrapper)}\nUse --force to overwrite it."
         )
         raise typer.Exit(code=0)
 
@@ -122,7 +117,7 @@ def install_command(
     if str(target_bin_dir) not in path_parts:
         print_warning(
             f"{_display_path(target_bin_dir)} is not on PATH.\n"
-            f"Add this to your shell profile: export PATH=\"{_display_path(target_bin_dir)}:$PATH\""
+            f'Add this to your shell profile: export PATH="{_display_path(target_bin_dir)}:$PATH"'
         )
 
 

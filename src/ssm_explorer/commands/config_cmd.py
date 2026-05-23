@@ -46,7 +46,11 @@ def path_command(
     """Print the active config file path and whether it exists."""
     resolved = resolve_config_path(config_file)
     exists = resolved.exists()
-    status = "[bright_green]✔ exists[/bright_green]" if exists else "[dim]✘ not found (using defaults)[/dim]"
+    status = (
+        "[bright_green]✔ exists[/bright_green]"
+        if exists
+        else "[dim]✘ not found (using defaults)[/dim]"
+    )
     console.print(f"\n  Config file: [#d8dee9]{resolved}[/#d8dee9]  {status}\n")
 
 
@@ -114,7 +118,7 @@ def show_command(
         "[aws]",
         [
             ("profile", active_cfg.aws.profile, "AWS named profile"),
-            ("region",  active_cfg.aws.region,  "AWS region"),
+            ("region", active_cfg.aws.region, "AWS region"),
         ],
     )
 
@@ -123,13 +127,17 @@ def show_command(
     _section_table(
         "[search]",
         [
-            ("default_path", dp,                               "Default SSM path prefix"),
-            ("recursive",    str(active_cfg.search.recursive), "Recurse sub-paths"),
-            ("decrypt",      str(active_cfg.search.decrypt),   "Decrypt SecureString values"),
+            ("default_path", dp, "Default SSM path prefix"),
+            ("recursive", str(active_cfg.search.recursive), "Recurse sub-paths"),
+            ("decrypt", str(active_cfg.search.decrypt), "Decrypt SecureString values"),
             ("fetch_strategy", active_cfg.search.fetch_strategy, "Fetch mode (auto/path/batch)"),
             ("fetch_workers", str(active_cfg.search.fetch_workers), "Batch fetch workers"),
             ("max_get_tps", str(active_cfg.search.max_get_tps), "GetParameter(s) TPS cap"),
-            ("max_describe_tps", str(active_cfg.search.max_describe_tps), "DescribeParameters TPS cap"),
+            (
+                "max_describe_tps",
+                str(active_cfg.search.max_describe_tps),
+                "DescribeParameters TPS cap",
+            ),
         ],
     )
 
@@ -137,15 +145,31 @@ def show_command(
     _section_table(
         "[display]",
         [
-            ("conceal",           str(active_cfg.display.conceal),           "Conceal SecureString values"),
-            ("show_arn",          str(active_cfg.display.show_arn),          "Show ARN column"),
-            ("show_env_variable", str(active_cfg.display.show_env_variable), "Show ENV variable column"),
-            ("show_value",        str(active_cfg.display.show_value),        "Show value column"),
-            ("show_type",         str(active_cfg.display.show_type),         "Show type column"),
-            ("show_full_path",    str(active_cfg.display.show_full_path),    "Show full parameter path column"),
-            ("show_version",      str(active_cfg.display.show_version),      "Show version column"),
-            ("show_last_modified", str(active_cfg.display.show_last_modified), "Show last modified column"),
-            ("max_value_length",  str(active_cfg.display.max_value_length),  "Max chars in Value column"),
+            ("conceal", str(active_cfg.display.conceal), "Conceal SecureString values"),
+            ("show_arn", str(active_cfg.display.show_arn), "Show ARN column"),
+            (
+                "show_env_variable",
+                str(active_cfg.display.show_env_variable),
+                "Show ENV variable column",
+            ),
+            ("show_value", str(active_cfg.display.show_value), "Show value column"),
+            ("show_type", str(active_cfg.display.show_type), "Show type column"),
+            (
+                "show_full_path",
+                str(active_cfg.display.show_full_path),
+                "Show full parameter path column",
+            ),
+            ("show_version", str(active_cfg.display.show_version), "Show version column"),
+            (
+                "show_last_modified",
+                str(active_cfg.display.show_last_modified),
+                "Show last modified column",
+            ),
+            (
+                "max_value_length",
+                str(active_cfg.display.max_value_length),
+                "Max chars in Value column",
+            ),
         ],
     )
 
@@ -153,8 +177,8 @@ def show_command(
     _section_table(
         "[filter]",
         [
-            ("enabled",      str(active_cfg.filter.enabled),      "Allow interactive browse command"),
-            ("default_mode", active_cfg.filter.default_mode,      "Default filter mode (name/value)"),
+            ("enabled", str(active_cfg.filter.enabled), "Allow interactive browse command"),
+            ("default_mode", active_cfg.filter.default_mode, "Default filter mode (name/value)"),
         ],
     )
 
@@ -168,10 +192,10 @@ def show_command(
     _section_table(
         "[output]",
         [
-            ("save",      save_val,                          "Enable file saving"),
-            ("path",      out_path,                          "Default output file path"),
-            ("format",    active_cfg.output.format,          "Export format (env/json)"),
-            ("overwrite", str(active_cfg.output.overwrite),  "Overwrite existing files"),
+            ("save", save_val, "Enable file saving"),
+            ("path", out_path, "Default output file path"),
+            ("format", active_cfg.output.format, "Export format (env/json)"),
+            ("overwrite", str(active_cfg.output.overwrite), "Overwrite existing files"),
         ],
     )
 
@@ -274,7 +298,8 @@ def init_command(
     config_file: Annotated[
         str | None,
         typer.Option(
-            "--config", "-c",
+            "--config",
+            "-c",
             help="Path where the config file should be written. Defaults to the standard location.",
             metavar="FILE",
         ),
@@ -282,7 +307,8 @@ def init_command(
     force: Annotated[
         bool,
         typer.Option(
-            "--force", "-f",
+            "--force",
+            "-f",
             help="Overwrite an existing config file.",
         ),
     ] = False,
@@ -302,10 +328,7 @@ def init_command(
     target = resolve_config_path(config_file)
 
     if target.exists() and not force:
-        print_warning(
-            f"Config file already exists: {target}\n"
-            "  Use --force to overwrite it."
-        )
+        print_warning(f"Config file already exists: {target}\n  Use --force to overwrite it.")
         raise typer.Exit(code=0)
 
     # Create parent directories if needed

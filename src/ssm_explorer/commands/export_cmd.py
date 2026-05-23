@@ -45,8 +45,7 @@ def export_command(
         str | None,
         typer.Argument(
             help=(
-                "SSM path prefix to export. "
-                "Falls back to search.default_path in config if omitted."
+                "SSM path prefix to export. Falls back to search.default_path in config if omitted."
             ),
             metavar="PATH",
         ),
@@ -78,7 +77,8 @@ def export_command(
     output_file: Annotated[
         Path | None,
         typer.Option(
-            "--output-file", "-O",
+            "--output-file",
+            "-O",
             help=(
                 "Destination file path. Requires output.save = true in config. "
                 "If not given, prints to stdout (always allowed)."
@@ -126,10 +126,10 @@ def export_command(
         print_error(str(exc))
         raise typer.Exit(code=1) from exc
     defaults = active.defaults_for_profiles(resolved_profile)
-    resolved_path     = active.resolve_path(path, resolved_profile)
-    resolved_decrypt  = decrypt   if decrypt   is not None else defaults.search.decrypt
-    resolved_recurse  = recursive if recursive is not None else defaults.search.recursive
-    resolved_fmt      = fmt       or defaults.output.format
+    resolved_path = active.resolve_path(path, resolved_profile)
+    resolved_decrypt = decrypt if decrypt is not None else defaults.search.decrypt
+    resolved_recurse = recursive if recursive is not None else defaults.search.recursive
+    resolved_fmt = fmt or defaults.output.format
     resolved_overwrite = overwrite if overwrite is not None else defaults.output.overwrite
 
     if not resolved_path:

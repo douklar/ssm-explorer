@@ -73,6 +73,7 @@ def resolve_config_path(override: str | None = None) -> Path:
 
 class AWSProfileConfig(BaseModel):
     """Specific AWS profile configuration (e.g. binding a region to a profile)."""
+
     region: str
     default_path: str = Field(
         default="",
@@ -172,9 +173,7 @@ class SearchConfig(BaseModel):
     @classmethod
     def validate_path(cls, v: str) -> str:
         if v and not v.startswith("/"):
-            raise ValueError(
-                f"search.default_path must start with '/'. Got: {v!r}"
-            )
+            raise ValueError(f"search.default_path must start with '/'. Got: {v!r}")
         return v
 
     @field_validator("fetch_strategy")
@@ -245,9 +244,7 @@ class DisplayConfig(BaseModel):
                 self.show_arn,
             )
         ):
-            raise ValueError(
-                "display must enable at least one visible table column."
-            )
+            raise ValueError("display must enable at least one visible table column.")
         return self
 
 
@@ -267,9 +264,7 @@ class FilterConfig(BaseModel):
     @classmethod
     def validate_mode(cls, v: str) -> str:
         if v not in ("name", "value"):
-            raise ValueError(
-                f"filter.default_mode must be 'name' or 'value'. Got: {v!r}"
-            )
+            raise ValueError(f"filter.default_mode must be 'name' or 'value'. Got: {v!r}")
         return v
 
 
@@ -285,8 +280,7 @@ class OutputConfig(BaseModel):
     save: bool = Field(
         default=False,
         description=(
-            "Enable saving command output to a local file. "
-            "MUST be true for --output-file to work."
+            "Enable saving command output to a local file. MUST be true for --output-file to work."
         ),
     )
     path: str = Field(
@@ -309,9 +303,7 @@ class OutputConfig(BaseModel):
     @classmethod
     def validate_format(cls, v: str) -> str:
         if v not in ("env", "json"):
-            raise ValueError(
-                f"output.format must be 'env' or 'json'. Got: {v!r}"
-            )
+            raise ValueError(f"output.format must be 'env' or 'json'. Got: {v!r}")
         return v
 
     @model_validator(mode="after")
@@ -368,7 +360,7 @@ class AppConfig(BaseModel):
                 "To enable saving, set  save = true  in your config file:\n\n"
                 "    [output]\n"
                 "    save = true\n"
-                "    path = \"/your/default/output/path\"  # optional\n\n"
+                '    path = "/your/default/output/path"  # optional\n\n'
                 "Or run:  ssm-explorer config init  to create a starter config."
             )
 
@@ -376,7 +368,9 @@ class AppConfig(BaseModel):
     # Convenience accessors (keep commands concise)
     # ------------------------------------------------------------------ #
 
-    def resolve_aws(self, profile_override: str | None, region_override: str | None) -> tuple[str, str]:
+    def resolve_aws(
+        self, profile_override: str | None, region_override: str | None
+    ) -> tuple[str, str]:
         """
         Resolve the final AWS profile and region.
 
@@ -391,9 +385,7 @@ class AppConfig(BaseModel):
         CLI profile.
         """
         profile = (
-            profile_override
-            or self.aws.profile
-            or self._resolve_profile_from_env_tags()
+            profile_override or self.aws.profile or self._resolve_profile_from_env_tags()
         ).strip()
         if not profile:
             raise ValueError(
@@ -436,7 +428,9 @@ class AppConfig(BaseModel):
 
     def profile_uses_config_defaults(self, profile_name: str) -> bool:
         """Return true when this profile has matching global or profile-specific config."""
-        return self._profile_matches_global_defaults(profile_name) or profile_name in self.aws.profiles
+        return (
+            self._profile_matches_global_defaults(profile_name) or profile_name in self.aws.profiles
+        )
 
     def defaults_for_profiles(self, *profile_names: str) -> AppConfig:
         """
@@ -677,30 +671,30 @@ def _apply_env_overrides(data: dict[str, Any]) -> dict[str, Any]:
             data[section][key] = val
 
     mapping: list[tuple[str, str, str, type]] = [
-        ("SSM_EXPLORER_AWS_PROFILE",                "aws",     "profile",           str),
-        ("SSM_EXPLORER_AWS_REGION",                 "aws",     "region",            str),
-        ("SSM_EXPLORER_SEARCH_DEFAULT_PATH",        "search",  "default_path",      str),
-        ("SSM_EXPLORER_SEARCH_RECURSIVE",           "search",  "recursive",         bool),
-        ("SSM_EXPLORER_SEARCH_DECRYPT",             "search",  "decrypt",           bool),
-        ("SSM_EXPLORER_SEARCH_FETCH_STRATEGY",      "search",  "fetch_strategy",    str),
-        ("SSM_EXPLORER_SEARCH_FETCH_WORKERS",       "search",  "fetch_workers",     int),
-        ("SSM_EXPLORER_SEARCH_MAX_GET_TPS",         "search",  "max_get_tps",       int),
-        ("SSM_EXPLORER_SEARCH_MAX_DESCRIBE_TPS",    "search",  "max_describe_tps",  int),
-        ("SSM_EXPLORER_DISPLAY_CONCEAL",            "display", "conceal",           bool),
-        ("SSM_EXPLORER_DISPLAY_SHOW_ARN",           "display", "show_arn",          bool),
-        ("SSM_EXPLORER_DISPLAY_SHOW_FULL_PATH",     "display", "show_full_path",    bool),
-        ("SSM_EXPLORER_DISPLAY_SHOW_ENV_VARIABLE",  "display", "show_env_variable", bool),
-        ("SSM_EXPLORER_DISPLAY_SHOW_VALUE",         "display", "show_value",        bool),
-        ("SSM_EXPLORER_DISPLAY_SHOW_TYPE",          "display", "show_type",         bool),
-        ("SSM_EXPLORER_DISPLAY_SHOW_VERSION",       "display", "show_version",      bool),
+        ("SSM_EXPLORER_AWS_PROFILE", "aws", "profile", str),
+        ("SSM_EXPLORER_AWS_REGION", "aws", "region", str),
+        ("SSM_EXPLORER_SEARCH_DEFAULT_PATH", "search", "default_path", str),
+        ("SSM_EXPLORER_SEARCH_RECURSIVE", "search", "recursive", bool),
+        ("SSM_EXPLORER_SEARCH_DECRYPT", "search", "decrypt", bool),
+        ("SSM_EXPLORER_SEARCH_FETCH_STRATEGY", "search", "fetch_strategy", str),
+        ("SSM_EXPLORER_SEARCH_FETCH_WORKERS", "search", "fetch_workers", int),
+        ("SSM_EXPLORER_SEARCH_MAX_GET_TPS", "search", "max_get_tps", int),
+        ("SSM_EXPLORER_SEARCH_MAX_DESCRIBE_TPS", "search", "max_describe_tps", int),
+        ("SSM_EXPLORER_DISPLAY_CONCEAL", "display", "conceal", bool),
+        ("SSM_EXPLORER_DISPLAY_SHOW_ARN", "display", "show_arn", bool),
+        ("SSM_EXPLORER_DISPLAY_SHOW_FULL_PATH", "display", "show_full_path", bool),
+        ("SSM_EXPLORER_DISPLAY_SHOW_ENV_VARIABLE", "display", "show_env_variable", bool),
+        ("SSM_EXPLORER_DISPLAY_SHOW_VALUE", "display", "show_value", bool),
+        ("SSM_EXPLORER_DISPLAY_SHOW_TYPE", "display", "show_type", bool),
+        ("SSM_EXPLORER_DISPLAY_SHOW_VERSION", "display", "show_version", bool),
         ("SSM_EXPLORER_DISPLAY_SHOW_LAST_MODIFIED", "display", "show_last_modified", bool),
-        ("SSM_EXPLORER_DISPLAY_MAX_VALUE_LENGTH",   "display", "max_value_length",  int),
-        ("SSM_EXPLORER_FILTER_ENABLED",             "filter",  "enabled",           bool),
-        ("SSM_EXPLORER_FILTER_DEFAULT_MODE",        "filter",  "default_mode",      str),
-        ("SSM_EXPLORER_OUTPUT_SAVE",                "output",  "save",              bool),
-        ("SSM_EXPLORER_OUTPUT_PATH",                "output",  "path",              str),
-        ("SSM_EXPLORER_OUTPUT_FORMAT",              "output",  "format",            str),
-        ("SSM_EXPLORER_OUTPUT_OVERWRITE",           "output",  "overwrite",         bool),
+        ("SSM_EXPLORER_DISPLAY_MAX_VALUE_LENGTH", "display", "max_value_length", int),
+        ("SSM_EXPLORER_FILTER_ENABLED", "filter", "enabled", bool),
+        ("SSM_EXPLORER_FILTER_DEFAULT_MODE", "filter", "default_mode", str),
+        ("SSM_EXPLORER_OUTPUT_SAVE", "output", "save", bool),
+        ("SSM_EXPLORER_OUTPUT_PATH", "output", "path", str),
+        ("SSM_EXPLORER_OUTPUT_FORMAT", "output", "format", str),
+        ("SSM_EXPLORER_OUTPUT_OVERWRITE", "output", "overwrite", bool),
     ]
     for env_key, section, field, cast in mapping:
         val = os.environ.get(env_key, "").strip()
