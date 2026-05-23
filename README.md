@@ -25,6 +25,9 @@
 - 🔍 **Search** parameters by path prefix (recursive or flat)
 - 🎯 **Filter** by environment variable name pattern (key or value)
 - 📋 **List** all parameters under a path with `ENV_VAR → value` display
+- 🖥️ **Interactive Browse** dynamic TUI parameter viewer (`browse`)
+- 🌐 **Deep Search** across multiple profiles and regions simultaneously (`deepsearch`)
+- ⚙️ **Config Management** view and set configurations directly from CLI (`config`)
 - 📤 **Export** parameters as `.env` file or JSON
 - 🔐 **SecureString** decryption support
 - 🗂️ **Multi-profile** AWS support via `--profile`
@@ -46,7 +49,7 @@ Use `search.fetch_strategy = "path"` in config to force the original single-API 
 
 ## Installation
 
-> **Requires Python 3.11+**
+> **Requires Python 3.10+**
 
 Poetry-first install. Run once from this repository:
 
@@ -228,6 +231,48 @@ ssm-explorer export /my/path/to/var \
   --output-file params.json
 ```
 
+#### `browse` — Interactively browse and live-filter parameters
+
+```bash
+# Browse with interactive TUI under a path
+ssm-explorer browse /my/path/to/var --profile my_profile_aws
+
+# With decryption of SecureString values
+ssm-explorer browse /my/path/to/var --profile my_profile_aws --decrypt
+
+# Print raw value to stdout after selection
+ssm-explorer browse /my/path --output value
+```
+
+Loads all parameters from the path, then opens a real-time TUI. Type to filter instantly. Press **Tab** to switch between filtering by ENV name or by value. Press **Up/Down** keys to navigate, and **Enter** to inspect the parameter. Press **Esc** or **Ctrl+C** to exit.
+
+#### `deepsearch` — Search parameters across multiple profiles/regions
+
+```bash
+# Deep search root path across profile/region combinations
+ssm-explorer deepsearch --profile dev,prod --region us-east-1,eu-west-1 --filter-path "DATABASE"
+
+# Deep search with value filtering and decryption
+ssm-explorer deepsearch --profile dev,stage --region us-east-1 --filter-value "postgres://" --decrypt
+```
+
+#### `config` — View and manage local configuration settings
+
+```bash
+# Print active config file path
+ssm-explorer config path
+
+# Initialise default config.toml file
+ssm-explorer config init
+
+# Display effective configuration settings
+ssm-explorer config show
+
+# Set a configuration parameter directly
+ssm-explorer config set aws.profile my_dev_profile
+ssm-explorer config set display.max_value_length 100
+```
+
 ---
 
 ## Multi-Account & Multi-Region Support
@@ -324,10 +369,17 @@ SSM/
 │       ├── config.py           # Settings & configuration (Pydantic)
 │       ├── commands/
 │       │   ├── __init__.py
-│       │   ├── list_cmd.py     # `list` command
-│       │   ├── search_cmd.py   # `search` command
+│       │   ├── browse_cmd.py   # `browse` command (interactive TUI)
+│       │   ├── check_cmd.py    # `check` command (diagnostics)
+│       │   ├── config_cmd.py   # `config` command group
+│       │   ├── deepsearch_cmd.py # `deepsearch` command
+│       │   ├── diff_cmd.py     # `diff` command
+│       │   ├── examples.py     # Command examples
+│       │   ├── export_cmd.py   # `export` command
 │       │   ├── get_cmd.py      # `get` command
-│       │   └── export_cmd.py   # `export` command
+│       │   ├── install_cmd.py  # `install` and `uninstall` wrapper commands
+│       │   ├── list_cmd.py     # `list` command
+│       │   └── search_cmd.py   # `search` command
 │       ├── aws/
 │       │   ├── __init__.py
 │       │   └── ssm_client.py   # AWS SSM client wrapper
@@ -336,12 +388,19 @@ SSM/
 │       │   └── parameter.py    # Pydantic data models
 │       └── display/
 │           ├── __init__.py
+│           ├── interactive.py  # Prompt-toolkit interactive filter TUI
 │           └── renderer.py     # Rich terminal rendering
 └── tests/
     ├── __init__.py
     ├── conftest.py
+    ├── test_check_cmd.py
+    ├── test_config.py
+    ├── test_deepsearch_cmd.py
+    ├── test_diff_cmd.py
+    ├── test_models.py
+    ├── test_renderer.py
     ├── test_ssm_client.py
-    └── test_models.py
+    └── test_table_column_cli.py
 ```
 
 ---
