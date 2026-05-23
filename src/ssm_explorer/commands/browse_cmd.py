@@ -187,7 +187,7 @@ def browse_command(
         selected = run_interactive_filter(result, initial_mode=initial_mode)
     except KeyboardInterrupt:
         console.print("\n  [dim]Cancelled.[/dim]")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=0) from None
 
     if selected is None:
         console.print("  [dim]No parameter selected. Exiting.[/dim]")

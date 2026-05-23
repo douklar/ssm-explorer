@@ -248,10 +248,10 @@ def set_command(
         active_cfg = AppConfig.model_validate(active_cfg.model_dump())
     except AttributeError:
         print_error(f"Unknown config section or field: '{key}'.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
     except ValueError as exc:
         print_error(f"Invalid value for '{key}': {exc}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
 
     try:
         path = resolve_config_path(config_file)
