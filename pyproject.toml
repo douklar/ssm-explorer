@@ -20,7 +20,7 @@ packages = [{include = "ssm_explorer", from = "src"}]
 python = "^3.10"
 boto3 = "^1.38.0"
 typer = {version = "^0.15.0", extras = ["all"]}
-rich = "^14.0.0"
+rich = ">=14,<16"
 pydantic = "^2.11.0"
 pydantic-settings = "^2.9.0"
 prompt-toolkit = "^3.0.48"
